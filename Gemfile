@@ -1,3 +1,4 @@
+# bundle list
 # bundle install
 
 source "https://rubygems.org"
