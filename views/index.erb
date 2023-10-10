@@ -1,9 +1,43 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- title -->
     <title>/index</title>
 </head>
 <body>
     <h1><%= @greeting %></h1>
+    <!-- editor -->
+    <textarea id="editor" rows="8" cols="50"></textarea>
+    <!-- output -->
+    <p>Output: <span id="output"></span></p>
+    <!-- update -->
+    <script>
+        const editor = document.getElementById("editor");
+        const output = document.getElementById("output");
+        // event listener
+        editor.addEventListener("input", function() {
+            const input = editor.value;
+            // send to server
+            fetch("/update", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ input }),
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error("something went wrong?")
+                }
+                return response.json();
+            }).then(data => {
+                // update output
+                output.innerHTML = data.data;
+            }).catch(error => {
+                console.error(error);
+            });
+        });
+    </script>
 </body>
 </html>
