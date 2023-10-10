@@ -17,7 +17,7 @@ post "/update" do
     # parse
     request_body = JSON.parse(request.body.read)
     # process
-    tokens = parse(request_body["input"])
+    ast = parse(request_body["input"])
     # return
-    { message: "ok", data: tokens.to_json }.to_json
+    { message: "ok", data: ast.to_json }.to_json
 end
