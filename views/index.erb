@@ -40,6 +40,7 @@
     <p><strong>Characters:</strong> <span id="characters">0</span></p>
     <p><strong>Tokens:</strong> <span id="tokens">[]</span></p>
     <p><strong>AST:</strong> <span id="ast">[]</span></p>
+    <p><strong>Output:</strong> <span id="result"></span></p>
     <!-- update -->
     <script>
         const editor = document.getElementById("editor");
@@ -62,6 +63,7 @@
                 document.getElementById("characters").innerHTML = data.characters;
                 document.getElementById("tokens").innerHTML = data.tokens;
                 document.getElementById("ast").innerHTML = data.ast;
+                document.getElementById("result").innerHTML = data.result;
             }).catch(error => {
                 console.error(error);
             });
