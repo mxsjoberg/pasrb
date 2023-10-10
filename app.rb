@@ -3,6 +3,8 @@ require "json"
 # auto-reload
 require "sinatra/reloader"
 
+require_relative "parser"
+
 set :views, File.join(settings.root, "views")
 
 get "/" do
@@ -15,7 +17,7 @@ post "/update" do
     # parse
     request_body = JSON.parse(request.body.read)
     # process
-    data = request_body
+    data = parse(request_body)
     # return
     { message: "ok", data: data["input"] }.to_json
 end
