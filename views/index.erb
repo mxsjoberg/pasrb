@@ -15,6 +15,11 @@
             font-size: 18px;
             padding: 2rem;
         }
+        h1,
+        p {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
         textarea {
             background: white;
             color: black;
@@ -23,12 +28,15 @@
             font-family: "Hack", monospace;
             font-size: 18px;
             border: none;
+            padding: 1rem;
+            box-sizing: border-box;
+            border-radius: 1rem;
         }
         textarea:hover {
-            outline: 4px solid turquoise;   
+            outline: 2px solid darkturquoise;   
         }
         textarea:focus {
-            outline: 4px solid darkturquoise;   
+            outline: 2px solid turquoise;   
         }
     </style>
 </head>
@@ -40,9 +48,15 @@
     <p><strong>Characters:</strong> <span id="characters">0</span></p>
     <p><strong>Tokens:</strong> <span id="tokens">[]</span></p>
     <p><strong>AST:</strong> <span id="ast">[]</span></p>
+    <p><strong>Issues:</strong> <span id="issues">[]</span></p>
     <p><strong>Output:</strong> <span id="result"></span></p>
     <!-- update -->
     <script>
+        // helpers
+        String.prototype.replaceAt = function(index, replacement) {
+            return this.substring(0, index) + replacement + this.substring(index + replacement.length);
+        }
+        // editor
         const editor = document.getElementById("editor");
         editor.addEventListener("input", function() {
             const input = editor.value;
@@ -63,7 +77,12 @@
                 document.getElementById("characters").innerHTML = data.characters;
                 document.getElementById("tokens").innerHTML = data.tokens;
                 document.getElementById("ast").innerHTML = data.ast;
+                document.getElementById("issues").innerHTML = data.issues;
                 document.getElementById("result").innerHTML = data.result;
+                // add issues to text
+                // JSON.parse(data.issues).forEach(item => {
+                //     document.getElementById("editor").value = document.getElementById("editor").value.replaceAt(item.pos, "?");
+                // });
             }).catch(error => {
                 console.error(error);
             });
