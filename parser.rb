@@ -100,6 +100,8 @@ def parse(text)
         ast = expr
     end
 
+    # puts text.length
+    # pp tokens
     # pp ast
-    ast
+    return text.length, tokens, ast
 end
