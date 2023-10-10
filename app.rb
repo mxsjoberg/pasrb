@@ -6,7 +6,7 @@ require "sinatra/reloader"
 set :views, File.join(settings.root, "views")
 
 get "/" do
-    @greeting = "hello sinatra"
+    @greeting = "Pascal in Ruby"
     erb :index
 end
 
