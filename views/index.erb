@@ -9,16 +9,26 @@
     <link rel='stylesheet' href='//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack-subset.css'>
     <style>
         body {
+            background: lightgrey;
+            color: black;
             font-family: "Hack", monospace;
             font-size: 18px;
             padding: 2rem;
         }
         textarea {
-            width: 100%;
+            background: white;
+            color: black;
+            min-width: 100%;
             min-height: 240px;
             font-family: "Hack", monospace;
             font-size: 18px;
-            padding: 1rem;
+            border: none;
+        }
+        textarea:hover {
+            outline: 4px solid turquoise;   
+        }
+        textarea:focus {
+            outline: 4px solid darkturquoise;   
         }
     </style>
 </head>
@@ -27,7 +37,7 @@
     <!-- editor -->
     <textarea id="editor" rows="8" cols="50"></textarea>
     <!-- output -->
-    <p>Output: <span id="output"></span></p>
+    <p>Output: <span id="output">[]</span></p>
     <!-- update -->
     <script>
         const editor = document.getElementById("editor");
