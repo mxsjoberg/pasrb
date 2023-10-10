@@ -78,6 +78,10 @@ def parse(text)
         case ch_current
         when /\d/
             number = ch_current
+            while /\d/.match?(text[ch_index + 1])
+                number << text[ch_index + 1]
+                ch_index += 1
+            end
             tokens << { type: "number", value: number, col: ch_index }
         when /[\+\-\*\/]/
             operator = ch_current
