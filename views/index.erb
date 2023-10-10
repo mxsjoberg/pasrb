@@ -36,15 +36,13 @@
     <h1><%= @greeting %></h1>
     <!-- editor -->
     <textarea id="editor"></textarea>
-    <!-- output -->
+    <!-- outputs -->
     <p><strong>Characters:</strong> <span id="characters">0</span></p>
     <p><strong>Tokens:</strong> <span id="tokens">[]</span></p>
     <p><strong>AST:</strong> <span id="ast">[]</span></p>
     <!-- update -->
     <script>
         const editor = document.getElementById("editor");
-        // const output = document.getElementById("output");
-        // event listener
         editor.addEventListener("input", function() {
             const input = editor.value;
             // send to server
@@ -61,8 +59,6 @@
                 return response.json();
             }).then(data => {
                 // console.log(data)
-                // update output
-                // output.innerHTML = data;
                 document.getElementById("characters").innerHTML = data.characters;
                 document.getElementById("tokens").innerHTML = data.tokens;
                 document.getElementById("ast").innerHTML = data.ast;
