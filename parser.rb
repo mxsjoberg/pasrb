@@ -20,6 +20,7 @@ def parse_expr(tokens, tk_index)
             term, tk_index = parse_term(tokens, tk_index)
             expr = [tk_current["value".to_sym], [expr, term]]
         rescue
+            $issues << { pos: tk_index, issue: "expected term after operator" }
         end
     end
 
@@ -40,6 +41,7 @@ def parse_term(tokens, tk_index)
             factor, tk_index = parse_factor(tokens, tk_index)
             term = [tk_current["value".to_sym], [term, factor]]
         rescue
+            $issues << { pos: tk_index, issue: "expected factor after operator" }
         end
     end
 
@@ -61,6 +63,8 @@ def parse_factor(tokens, tk_index)
             # closing parentheses
             if tk_index < tokens.length && tokens[tk_index]["value".to_sym] == ")"
                 tk_index += 1
+            else
+                $issues << { pos: tk_index, issue: "no closing parentheses" }
             end
         rescue
         end
@@ -70,6 +74,7 @@ def parse_factor(tokens, tk_index)
 end
 
 def parse(text)
+    $issues = Array.new
     # tokens
     tokens = Array.new
     ch_index = 0
@@ -77,8 +82,6 @@ def parse(text)
     while ch_index < text.length
         ch_current = text[ch_index]
         case ch_current
-        when " " || "\t" || "\r"
-            # skip
         when /\d/
             number = ch_current
             while /\d/.match?(text[ch_index + 1])
@@ -107,5 +110,5 @@ def parse(text)
     end
 
     # pp ast
-    return text.length, tokens, ast
+    return text.length, tokens, ast, $issues
 end
