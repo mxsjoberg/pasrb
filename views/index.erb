@@ -38,8 +38,8 @@
     <textarea id="editor" rows="8" cols="50"></textarea>
     <!-- output -->
     <p><strong>Characters:</strong> <span id="characters">0</span></p>
-    <p><strong>Tokens:<strong> <span id="tokens">[]</span></p>
-    <p><strong>AST:<strong> <span id="ast">[]</span></p>
+    <p><strong>Tokens:</strong> <span id="tokens">[]</span></p>
+    <p><strong>AST:</strong> <span id="ast">[]</span></p>
     <!-- update -->
     <script>
         const editor = document.getElementById("editor");
@@ -63,7 +63,7 @@
                 // console.log(data)
                 // update output
                 // output.innerHTML = data;
-                document.getElementById("characters").innerHTML = data.text_length;
+                document.getElementById("characters").innerHTML = data.characters;
                 document.getElementById("tokens").innerHTML = data.tokens;
                 document.getElementById("ast").innerHTML = data.ast;
             }).catch(error => {
