@@ -82,10 +82,10 @@ def parse(text)
                 number << text[ch_index + 1]
                 ch_index += 1
             end
-            tokens << { type: "number", value: number, col: ch_index }
+            tokens << { type: "number", value: number, pos: ch_index }
         when /[\+\-\*\/]/
             operator = ch_current
-            tokens << { type: "operator", value: operator, col: ch_index }
+            tokens << { type: "operator", value: operator, pos: ch_index }
         end
 
         ch_index += 1
