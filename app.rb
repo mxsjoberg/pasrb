@@ -4,6 +4,7 @@ require "json"
 require "sinatra/reloader"
 
 require_relative "parser"
+require_relative "interpreter"
 
 set :views, File.join(settings.root, "views")
 
@@ -17,6 +18,8 @@ post "/update" do
     request_body = JSON.parse(request.body.read)
     # parse
     characters, tokens, ast = parse(request_body["input"])
-    # return
-    { message: "ok", characters: characters, tokens: tokens.to_json, ast: ast.to_json }.to_json
+    # interpret
+    result = interpret(ast)
+    # return json
+    { message: "ok", characters: characters, tokens: tokens.to_json, ast: ast.to_json, result: result }.to_json
 end
