@@ -9,7 +9,7 @@ require_relative "interpreter"
 set :views, File.join(settings.root, "views")
 
 get "/" do
-    @greeting = "Pascal in Ruby"
+    @title = "Pascal in Ruby"
     erb :index
 end
 
