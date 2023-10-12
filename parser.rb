@@ -11,7 +11,7 @@ require 'pp'
 # - use ? for input and ! for output
 
 # statement ::= (identifier ':=' expr
-#             | 'if' condition 'then' statement
+#             | 'if' condition 'then' statement 'end'
 #             | 'while' condition 'do' statement)*
 
 # condition ::= 'odd' expr
