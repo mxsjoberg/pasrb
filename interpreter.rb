@@ -1,7 +1,7 @@
 # interpreter.rb
 
 def interpret(ast)
-    result = ""
+    result = nil
     node = ast
 
     if node.kind_of?(Array)
@@ -25,5 +25,5 @@ def interpret(ast)
         return left
     end
 
-    result
+    result ? result : "nil"
 end
