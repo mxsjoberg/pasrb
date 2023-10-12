@@ -10,9 +10,9 @@ require 'pp'
 # - add 'end' to 'if' and 'while' statements
 # - use ? for input and ! for output
 
-# statement ::= identifier ':=' expr
+# statement ::= (identifier ':=' expr
 #             | 'if' condition 'then' statement
-#             | 'while' condition 'do' statement
+#             | 'while' condition 'do' statement)*
 
 # condition ::= 'odd' expr
 #             | expr ('=' | '<' | '>') expr
@@ -25,8 +25,54 @@ require 'pp'
 #             | number
 #             | '(' expr ')'
 
+# statement ::= (identifier ':=' expr | 'if' condition 'then' statement | 'while' condition 'do' statement)*
 def parse_statement(tokens, tk_index)
+    statement = Array.new
 
+    # puts tokens[tk_index]
+
+    while tk_index < tokens.length && (tokens[tk_index]["type".to_sym] == "identifier" || tokens[tk_index]["type".to_sym] == "keyword")
+        tk_current = tokens[tk_index]
+        tk_index += 1
+
+        case tk_current["type".to_sym]
+        when "identifier"
+            identifier = tk_current["value".to_sym]
+            begin
+                if tokens[tk_index]["type".to_sym] == "assignment"
+                    tk_index += 1
+                    # expr
+                    expr, tk_index = parse_expr(tokens, tk_index)
+                    statement << ["assignment", [identifier, expr]]
+                end
+            rescue
+                $issues << { pos: tk_index, issue: "expected ':=' after identifier" }
+            end
+        when "keyword"
+            case tk_current["value".to_sym]
+            when "if"
+                begin
+                    # condition
+                    condition, tk_index = parse_condition(tokens, tk_index)
+                    # 'then'
+                    begin 
+                        if tokens[tk_index]["value".to_sym] == "then"
+                            tk_index += 1
+                        end
+                    rescue
+                        $issues << { pos: tk_index, issue: "expected 'then' after condition" }
+                    end
+                rescue
+                    $issues << { pos: tk_index, issue: "expected condition after 'if' keyword" }
+                end
+                # statements (nested)
+                statements, tk_index = parse_statement(tokens, tk_index)
+                statement << ["if", [condition, statements]]
+            end
+        end
+    end
+
+    return statement, tk_index
 end
 
 def parse_condition(tokens, tk_index)
@@ -117,12 +163,18 @@ def parse_term(tokens, tk_index)
     return term, tk_index
 end
 
+# factor ::= identifier | number | '(' expr ')'
 def parse_factor(tokens, tk_index)
     factor = Array.new
     tk_current = tokens[tk_index]
     tk_index += 1
-    # number
+
     case tk_current["type".to_sym]
+    when "identifier"
+        factor = $symbols[tk_current["value".to_sym].to_sym]
+        if factor.nil?
+            $issues << { pos: tk_index, issue: "identifier not found" }
+        end
     when "number"
         factor = tk_current["value".to_sym]
     when "parentheses"
@@ -146,6 +198,7 @@ end
 
 def parse(text)
     $issues = Array.new
+    $symbols = Hash.new
     # tokens
     tokens = tokenize(text)
     # tokens = Array.new
@@ -196,10 +249,8 @@ def parse(text)
     ast = Array.new
     tk_index = 0
 
-    while tk_index < tokens.length
-        expr, tk_index = parse_condition(tokens, tk_index)
-        ast = expr
-    end
+    expr, tk_index = parse_statement(tokens, tk_index)
+    ast = expr
 
     # pp ast
     return text.length, tokens, ast, $issues
@@ -228,6 +279,7 @@ def tokenize(text)
             tokens << { type: "parentheses", value: ch_current, pos: ch_index }
         when /\:/
             if text[ch_index + 1] == "="
+                ch_index += 1
                 tokens << { type: "assignment", value: ":=", pos: ch_index }
             else
                 $issues << { pos: ch_index, issue: "expecting '=' after ':'" }
