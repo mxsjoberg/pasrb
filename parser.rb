@@ -4,6 +4,8 @@ require 'pp'
 
 # https://en.wikipedia.org/wiki/PL/0
 
+# TODO: create my own "dialect", i.e. remove semicolons, replace begin/end with {}?
+
 # statement ::= identifier ':=' expr
 #             | 'if' condition 'then' statement
 #             | 'while' condition 'do' statement
