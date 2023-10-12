@@ -53,10 +53,6 @@
     <p><strong>Output:</strong> <span id="result"></span></p>
     <!-- update -->
     <script>
-        // helpers
-        // String.prototype.replaceAt = function(index, replacement) {
-        //     return this.substring(0, index) + replacement + this.substring(index + replacement.length);
-        // }
         // editor
         const editor = document.getElementById("editor");
         editor.addEventListener("input", function() {
@@ -74,19 +70,26 @@
                 }
                 return response.json();
             }).then(data => {
-                // console.log(data)
                 document.getElementById("characters").innerHTML = data.characters;
                 document.getElementById("tokens").innerHTML = data.tokens;
                 document.getElementById("ast").innerHTML = data.ast;
                 document.getElementById("issues").innerHTML = data.issues;
                 document.getElementById("result").innerHTML = data.result;
-                // add issues to text
-                // JSON.parse(data.issues).forEach(item => {
-                //     document.getElementById("editor").value = document.getElementById("editor").value.replaceAt(item.pos, "?");
-                // });
             }).catch(error => {
                 console.error(error);
             });
+        });
+        // capture tab in textarea https://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea
+        document.getElementById('editor').addEventListener('keydown', function(e) {
+            if (e.key == 'Tab') {
+                e.preventDefault();
+                var start = this.selectionStart;
+                var end = this.selectionEnd;
+                // set textarea value to text before caret + tab + text after caret
+                this.value = this.value.substring(0, start) + "\t" + this.value.substring(end);
+                // put caret at right position again
+                this.selectionStart = this.selectionEnd = start + 1;
+            }
         });
     </script>
 </body>
