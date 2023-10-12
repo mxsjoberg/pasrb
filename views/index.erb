@@ -8,8 +8,11 @@
     <!-- style -->
     <link rel='stylesheet' href='//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack-subset.css'>
     <style>
+        ::selection {
+            background: #FD3E3E;
+        }
         body {
-            background: lightgrey;
+            background: lightcoral;
             color: black;
             font-family: "Hack", monospace;
             font-size: 18px;
@@ -20,6 +23,9 @@
             padding-left: 1rem;
             padding-right: 1rem;
         }
+        a {
+            color: white;
+        }
         textarea {
             background: white;
             color: black;
@@ -27,16 +33,14 @@
             min-height: 240px;
             font-family: "Hack", monospace;
             font-size: 18px;
-            border: none;
+            border: 2px solid black;
             padding: 1rem;
             box-sizing: border-box;
             border-radius: 1rem;
-        }
-        textarea:hover {
-            outline: 2px solid darkturquoise;   
+            outline: none !important;
         }
         textarea:focus {
-            outline: 2px solid turquoise;   
+            border: 2px solid #FD3E3E;
         }
     </style>
 </head>
@@ -50,7 +54,7 @@
     <p><strong>Tokens:</strong> <span id="tokens">[]</span></p>
     <p><strong>AST:</strong> <span id="ast">[]</span></p>
     <p><strong>Issues:</strong> <span id="issues">[]</span></p>
-    <p><strong>Output:</strong> <span id="result"></span></p>
+    <p><strong>Output:</strong> <span id="result">nil</span></p>
     <!-- update -->
     <script>
         // editor
