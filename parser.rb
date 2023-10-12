@@ -6,7 +6,8 @@ require 'pp'
 
 # TODO: create my own "dialect"
 # - remove semicolons
-# - replace begin/end with {}
+# - replace begin/end blocks with {}
+# - add 'end' to 'if' and 'while' statements
 # - use ? for input and ! for output
 
 # statement ::= identifier ':=' expr
@@ -25,7 +26,7 @@ require 'pp'
 #             | '(' expr ')'
 
 def parse_statement(tokens, tk_index)
-    
+
 end
 
 def parse_condition(tokens, tk_index)
@@ -146,6 +147,65 @@ end
 def parse(text)
     $issues = Array.new
     # tokens
+    tokens = tokenize(text)
+    # tokens = Array.new
+    # ch_index = 0
+
+    # while ch_index < text.length
+    #     ch_current = text[ch_index]
+    #     case ch_current
+    #     when /[\s\t\r\n]/
+    #     when /\d/
+    #         number = ch_current
+    #         while /\d/.match?(text[ch_index + 1])
+    #             number << text[ch_index + 1]
+    #             ch_index += 1
+    #         end
+    #         tokens << { type: "number", value: number, pos: ch_index }
+    #     when /[\+\-\*\/]/
+    #         tokens << { type: "operator", value: ch_current, pos: ch_index }
+    #     when /[\=\<\>]/
+    #         tokens << { type: "comparison", value: ch_current, pos: ch_index }
+    #     when /[\(\)]/
+    #         tokens << { type: "parentheses", value: ch_current, pos: ch_index }
+    #     when /\:/
+    #         if text[ch_index + 1] == "="
+    #             tokens << { type: "assignment", value: ":=", pos: ch_index }
+    #         else
+    #             $issues << { pos: ch_index, issue: "expecting '=' after ':'" }
+    #         end
+    #     when /[a-zA-Z]/
+    #         identifier = ch_current
+    #         while /[a-zA-Z]/.match?(text[ch_index + 1])
+    #             identifier << text[ch_index + 1]
+    #             ch_index += 1
+    #         end
+    #         if identifier == "odd" || identifier == "if" || identifier == "then" || identifier == "while" || identifier == "do"
+    #             tokens << { type: "keyword", value: identifier, pos: ch_index }
+    #         else
+    #             tokens << { type: "identifier", value: identifier, pos: ch_index }
+    #         end
+    #     else
+    #         $issues << { pos: ch_index, issue: "unknown character" }
+    #     end
+
+    #     ch_index += 1
+    # end
+
+    # ast
+    ast = Array.new
+    tk_index = 0
+
+    while tk_index < tokens.length
+        expr, tk_index = parse_condition(tokens, tk_index)
+        ast = expr
+    end
+
+    # pp ast
+    return text.length, tokens, ast, $issues
+end
+
+def tokenize(text)
     tokens = Array.new
     ch_index = 0
 
@@ -166,8 +226,12 @@ def parse(text)
             tokens << { type: "comparison", value: ch_current, pos: ch_index }
         when /[\(\)]/
             tokens << { type: "parentheses", value: ch_current, pos: ch_index }
-        when /[\:]/ && text[ch_index + 1] == "="
-            tokens << { type: "assignment", value: ":=", pos: ch_index }
+        when /\:/
+            if text[ch_index + 1] == "="
+                tokens << { type: "assignment", value: ":=", pos: ch_index }
+            else
+                $issues << { pos: ch_index, issue: "expecting '=' after ':'" }
+            end
         when /[a-zA-Z]/
             identifier = ch_current
             while /[a-zA-Z]/.match?(text[ch_index + 1])
@@ -186,15 +250,6 @@ def parse(text)
         ch_index += 1
     end
 
-    # ast
-    ast = Array.new
-    tk_index = 0
-
-    while tk_index < tokens.length
-        expr, tk_index = parse_condition(tokens, tk_index)
-        ast = expr
-    end
-
-    # pp ast
-    return text.length, tokens, ast, $issues
+    tokens
 end
+
