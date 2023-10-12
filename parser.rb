@@ -4,7 +4,10 @@ require 'pp'
 
 # https://en.wikipedia.org/wiki/PL/0
 
-# TODO: create my own "dialect", i.e. remove semicolons, replace begin/end with {}?
+# TODO: create my own "dialect"
+# - remove semicolons
+# - replace begin/end with {}
+# - use ? for input and ! for output
 
 # statement ::= identifier ':=' expr
 #             | 'if' condition 'then' statement
