@@ -7,29 +7,20 @@ require 'pp'
 # TODO: create my own "dialect"
 # - remove semicolons
 # - replace begin/end blocks with {}
-# - add 'end' to 'if' and 'while' statements
+# - add 'end' to 'if' and 'while' statements WHY ISSUE WITH END BUT NOT }
 # - use ? for input and ! for output
 
 # statement ::= (identifier ':=' expr
-#             | 'if' condition 'then' statement 'end'
-#             | 'while' condition 'do' statement)*
+#             | 'if' condition ('then' | '{') statement ('end' | '}')
+#             | 'while' condition ('do' | '{') statement ('end' | '}'))*
 
-# condition ::= 'odd' expr
-#             | expr ('=' | '<' | '>') expr
-
+# condition ::= 'odd' expr | expr ('=' | '<' | '>') expr
 # expr      ::= term (('+' | '-') term)*
-
 # term      ::= factor (('*' | '/') factor)*
+# factor    ::= identifier | number | '(' expr ')'
 
-# factor    ::= identifier
-#             | number
-#             | '(' expr ')'
-
-# statement ::= (identifier ':=' expr | 'if' condition 'then' statement | 'while' condition 'do' statement)*
 def parse_statement(tokens, tk_index)
     statement = Array.new
-
-    # puts tokens[tk_index]
 
     while tk_index < tokens.length && (tokens[tk_index]["type".to_sym] == "identifier" || tokens[tk_index]["type".to_sym] == "keyword")
         tk_current = tokens[tk_index]
@@ -54,20 +45,27 @@ def parse_statement(tokens, tk_index)
                 begin
                     # condition
                     condition, tk_index = parse_condition(tokens, tk_index)
-                    # 'then'
+                    # ('then' | '{')
                     begin 
-                        if tokens[tk_index]["value".to_sym] == "then"
+                        if tokens[tk_index]["value".to_sym] == "then" || tokens[tk_index]["value".to_sym] == "{"
                             tk_index += 1
                         end
                     rescue
-                        $issues << { pos: tk_index, issue: "expected 'then' after condition" }
+                        $issues << { pos: tk_index, issue: "expected 'then' or opening braces after condition" }
                     end
                 rescue
                     $issues << { pos: tk_index, issue: "expected condition after 'if' keyword" }
                 end
-                # statements (nested)
                 statements, tk_index = parse_statement(tokens, tk_index)
                 statement << ["if", [condition, statements]]
+                # closing braces
+                begin
+                    if tokens[tk_index]["value".to_sym] == "end" || tokens[tk_index]["value".to_sym] == "}"
+                        tk_index += 1
+                    end
+                rescue
+                    $issues << { pos: tk_index, issue: "expected 'end' or closing braces" }
+                end
             end
         end
     end
@@ -163,7 +161,6 @@ def parse_term(tokens, tk_index)
     return term, tk_index
 end
 
-# factor ::= identifier | number | '(' expr ')'
 def parse_factor(tokens, tk_index)
     factor = Array.new
     tk_current = tokens[tk_index]
@@ -263,7 +260,9 @@ def tokenize(text)
     while ch_index < text.length
         ch_current = text[ch_index]
         case ch_current
+        # whitespace
         when /[\s\t\r\n]/
+        # number
         when /\d/
             number = ch_current
             while /\d/.match?(text[ch_index + 1])
@@ -271,12 +270,19 @@ def tokenize(text)
                 ch_index += 1
             end
             tokens << { type: "number", value: number, pos: ch_index }
+        # operator
         when /[\+\-\*\/]/
             tokens << { type: "operator", value: ch_current, pos: ch_index }
+        # comparison
         when /[\=\<\>]/
             tokens << { type: "comparison", value: ch_current, pos: ch_index }
+        # parentheses
         when /[\(\)]/
             tokens << { type: "parentheses", value: ch_current, pos: ch_index }
+        # braces
+        when /[\{\}]/
+            tokens << { type: "braces", value: ch_current, pos: ch_index }
+        # assignment
         when /\:/
             if text[ch_index + 1] == "="
                 ch_index += 1
@@ -284,13 +290,14 @@ def tokenize(text)
             else
                 $issues << { pos: ch_index, issue: "expecting '=' after ':'" }
             end
+        # identifier
         when /[a-zA-Z]/
             identifier = ch_current
             while /[a-zA-Z]/.match?(text[ch_index + 1])
                 identifier << text[ch_index + 1]
                 ch_index += 1
             end
-            if identifier == "odd" || identifier == "if" || identifier == "then" || identifier == "while" || identifier == "do"
+            if identifier == "odd" || identifier == "if" || identifier == "then" || identifier == "while" || identifier == "do" || identifier == "end"
                 tokens << { type: "keyword", value: identifier, pos: ch_index }
             else
                 tokens << { type: "identifier", value: identifier, pos: ch_index }
