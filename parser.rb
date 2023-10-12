@@ -2,9 +2,58 @@
 
 require 'pp'
 
+# https://en.wikipedia.org/wiki/PL/0
+
+# statement ::= identifier ':=' expr
+#             | 'if' condition 'then' statement
+#             | 'while' condition 'do' statement
+
+# condition ::= 'odd' expr
+#             | expr ('=' | '<' | '>') expr
+
 # expr      ::= term (('+' | '-') term)*
+
 # term      ::= factor (('*' | '/') factor)*
-# factor    ::= number | '(' expr ')'
+
+# factor    ::= identifier
+#             | number
+#             | '(' expr ')'
+
+def parse_condition(tokens, tk_index)
+    condition = Array.new
+    tk_current = tokens[tk_index]
+    # 'odd'
+    if tk_current["type".to_sym] == "keyword" && tk_current["value".to_sym] == "odd"
+        tk_index += 1
+        expr, tk_index = parse_expr(tokens, tk_index)
+        condition = ["odd", expr]
+    else
+        # expr
+        expr, tk_index = parse_expr(tokens, tk_index)
+        condition = expr
+        # comparison
+        begin
+            tk_current = tokens[tk_index]
+            tk_index += 1
+            case tk_current["type".to_sym]
+            when "comparison"
+                # expr
+                begin
+                    expr, tk_index = parse_expr(tokens, tk_index)
+                    condition = [tk_current["value".to_sym], [condition, expr]]
+                rescue
+                    $issues << { pos: tk_index, issue: "expected expression after comparison" }
+                end
+            end
+        rescue
+            $issues << { pos: tk_index, issue: "expected comparison after expression" }
+        end
+    end
+
+    puts condition
+
+    return condition, tk_index
+end
 
 def parse_expr(tokens, tk_index)
     expr = Array.new
@@ -90,11 +139,24 @@ def parse(text)
             end
             tokens << { type: "number", value: number, pos: ch_index }
         when /[\+\-\*\/]/
-            operator = ch_current
-            tokens << { type: "operator", value: operator, pos: ch_index }
+            tokens << { type: "operator", value: ch_current, pos: ch_index }
+        when /[\=\<\>]/
+            tokens << { type: "comparison", value: ch_current, pos: ch_index }
         when /[\(\)]/
-            parentheses = ch_current
-            tokens << { type: "parentheses", value: parentheses, pos: ch_index }
+            tokens << { type: "parentheses", value: ch_current, pos: ch_index }
+        when /[\:]/ && text[ch_index + 1] == "="
+            tokens << { type: "assignment", value: ":=", pos: ch_index }
+        when /[a-zA-Z]/
+            identifier = ch_current
+            while /[a-zA-Z]/.match?(text[ch_index + 1])
+                identifier << text[ch_index + 1]
+                ch_index += 1
+            end
+            if identifier == "odd" || identifier == "if" || identifier == "then" || identifier == "while" || identifier == "do"
+                tokens << { type: "keyword", value: identifier, pos: ch_index }
+            else
+                tokens << { type: "identifier", value: identifier, pos: ch_index }
+            end
         end
 
         ch_index += 1
@@ -105,7 +167,7 @@ def parse(text)
     tk_index = 0
 
     while tk_index < tokens.length
-        expr, tk_index = parse_expr(tokens, tk_index)
+        expr, tk_index = parse_condition(tokens, tk_index)
         ast = expr
     end
 
