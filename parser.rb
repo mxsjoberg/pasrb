@@ -24,38 +24,52 @@ require 'pp'
 #             | number
 #             | '(' expr ')'
 
+def parse_statement(tokens, tk_index)
+    
+end
+
 def parse_condition(tokens, tk_index)
     condition = Array.new
     tk_current = tokens[tk_index]
-    # 'odd'
-    if tk_current["type".to_sym] == "keyword" && tk_current["value".to_sym] == "odd"
-        tk_index += 1
-        expr, tk_index = parse_expr(tokens, tk_index)
-        condition = ["odd", expr]
+
+    case tk_current["type".to_sym]
+    when "keyword"
+        if tk_current["value".to_sym] == "odd"
+            tk_index += 1
+            begin
+                expr, tk_index = parse_expr(tokens, tk_index)
+                condition = ["odd", expr]
+            rescue
+                $issues << { pos: tk_index, issue: "expected expression after keyword 'odd'" }
+            end
+        else
+            $issues << { pos: tk_index, issue: "expected keyword 'odd'" }
+        end
     else
         # expr
         expr, tk_index = parse_expr(tokens, tk_index)
         condition = expr
-        # comparison
-        begin
-            tk_current = tokens[tk_index]
-            tk_index += 1
-            case tk_current["type".to_sym]
-            when "comparison"
-                # expr
-                begin
-                    expr, tk_index = parse_expr(tokens, tk_index)
-                    condition = [tk_current["value".to_sym], [condition, expr]]
-                rescue
-                    $issues << { pos: tk_index, issue: "expected expression after comparison" }
+
+        unless condition.empty?
+            # comparison
+            begin
+                tk_current = tokens[tk_index]
+                tk_index += 1
+                case tk_current["type".to_sym]
+                when "comparison"
+                    # expr
+                    begin
+                        expr, tk_index = parse_expr(tokens, tk_index)
+                        condition = [tk_current["value".to_sym], [condition, expr]]
+                    rescue
+                        $issues << { pos: tk_index, issue: "expected expression after comparison" }
+                    end
                 end
+            rescue
+                $issues << { pos: tk_index, issue: "expected comparison after expression" }
             end
-        rescue
-            $issues << { pos: tk_index, issue: "expected comparison after expression" }
         end
     end
-
-    puts condition
 
     return condition, tk_index
 end
@@ -114,11 +128,13 @@ def parse_factor(tokens, tk_index)
         begin
             expr, tk_index = parse_expr(tokens, tk_index)
             factor = expr
-            # closing parentheses
-            if tk_index < tokens.length && tokens[tk_index]["value".to_sym] == ")"
-                tk_index += 1
-            else
-                $issues << { pos: tk_index, issue: "no closing parentheses" }
+            unless factor.empty?
+                # closing parentheses
+                if tk_index < tokens.length && tokens[tk_index]["value".to_sym] == ")"
+                    tk_index += 1
+                elsif tk_index < tokens.length
+                    $issues << { pos: tk_index, issue: "no closing parentheses" }
+                end
             end
         rescue
         end
@@ -136,6 +152,7 @@ def parse(text)
     while ch_index < text.length
         ch_current = text[ch_index]
         case ch_current
+        when /[\s\t\r\n]/
         when /\d/
             number = ch_current
             while /\d/.match?(text[ch_index + 1])
@@ -162,6 +179,8 @@ def parse(text)
             else
                 tokens << { type: "identifier", value: identifier, pos: ch_index }
             end
+        else
+            $issues << { pos: ch_index, issue: "unknown character" }
         end
 
         ch_index += 1
