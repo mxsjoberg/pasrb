@@ -23,6 +23,8 @@ def interpret(ast)
         end
     end
 
+    # pp left
+
     case left
     when /\+/
         return interpret(right[0]).to_i + interpret(right[1]).to_i
@@ -35,7 +37,7 @@ def interpret(ast)
     when /\>/
         return interpret(right[0]).to_i > interpret(right[1]).to_i
     when /\</
-        return interpret(right[0]).to_i > interpret(right[1]).to_i
+        return interpret(right[0]).to_i < interpret(right[1]).to_i
     when /\=/
         return interpret(right[0]).to_i == interpret(right[1]).to_i
     when /\d/
@@ -50,6 +52,11 @@ def interpret(ast)
         if interpret(right[0])
             return interpret(right[1])
         end
+    when "while"
+        while interpret(right[0])
+            interpret(right[1])
+        end
+        return
     when /[a-zA-Z]/
         return $symbols[left.to_sym]
     end
