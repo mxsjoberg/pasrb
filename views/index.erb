@@ -43,6 +43,20 @@
         textarea:focus {
             border: 2px solid #FD3E3E;
         }
+        input {
+            background: white;
+            color: black;
+            font-family: "Hack", monospace;
+            font-size: 18px;
+            border: 2px solid black;
+            padding: 1rem;
+            box-sizing: border-box;
+            border-radius: 1rem;
+            outline: none !important;
+        }
+        input:focus {
+            border: 2px solid #FD3E3E;
+        }
         span.token-wrapper {
             line-height: 1.5;
         }
@@ -91,6 +105,9 @@
                 document.getElementById("inputs").innerHTML = "";
                 try {
                     Object.entries(JSON.parse(data.input)).forEach(identifier => {
+                        if (identifier[1] == null) {
+                            identifier[1] = "";
+                        }
                         // append input to inputs
                         document.getElementById("inputs").innerHTML += `<input id="input-${identifier[0]}" placeholder='${identifier[0]}' value='${identifier[1]}'></input>`;
                     });
