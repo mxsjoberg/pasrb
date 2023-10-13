@@ -1,7 +1,5 @@
 # interpreter.rb
 
-# TODO: add rest of grammar
-
 def interpret(ast)
     node = ast
 
@@ -22,8 +20,6 @@ def interpret(ast)
             left = left[0]
         end
     end
-
-    # pp left
 
     case left
     when /\+/
@@ -47,6 +43,9 @@ def interpret(ast)
         return
     when "output"
         $output << interpret(right)
+        return
+    when "input"
+        $symbols[right.to_sym] = $input[right.to_sym]
         return
     when "if"
         if interpret(right[0])
