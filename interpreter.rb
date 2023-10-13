@@ -31,6 +31,12 @@ def interpret(ast)
     when "output"
         $output << interpret(right)
         return
+    when "if"
+        pp right
+        # TODO: traverse nested or change how parser build ast?
+        if interpret(right[0])
+            return interpret(right[1])
+        end
     when /[a-zA-Z]/
         return $symbols[left.to_sym]
     end
