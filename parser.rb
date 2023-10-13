@@ -34,8 +34,9 @@ def parse_statement(tokens, tk_index)
     #     tokens[tk_index]["type".to_sym] == "keyword"
     # )
     while tk_index < tokens.length && (["input", "output", "identifier", "keyword"].include? tokens[tk_index]["type".to_sym])
+    # while tk_index < tokens.length
         tk_current = tokens[tk_index]
-
+        
         case tk_current["type".to_sym]
         when "input"
             tk_index += 1
@@ -55,9 +56,9 @@ def parse_statement(tokens, tk_index)
         when "identifier"
             tk_index += 1
             identifier = tk_current["value".to_sym]
-            unless $identifiers.include? identifier
-                $identifiers << identifier
-            end
+            # unless $identifiers.include? identifier
+            #     $identifiers << identifier
+            # end
             begin
                 if tokens[tk_index]["type".to_sym] == "assignment"
                     tk_index += 1
@@ -124,7 +125,7 @@ def parse_statement(tokens, tk_index)
                     $issues << { pos: tk_index, issue: "expected 'end' or closing braces" }
                 end
             when "end"
-                # break current block at 'end'
+                # break while at 'end'
                 break
             end
         end
@@ -228,12 +229,6 @@ def parse_factor(tokens, tk_index)
 
     case tk_current["type".to_sym]
     when "identifier"
-        # TODO: this should be in interpreter
-        # factor = $symbols[tk_current["value".to_sym].to_sym]
-        # if factor.nil?
-        #     factor = "0"
-        #     $issues << { pos: tk_index, issue: "identifier not found" }
-        # end
         identifier = tk_current["value".to_sym]
         factor = identifier
         unless $identifiers.include? identifier
@@ -274,6 +269,10 @@ def parse(text)
 
     pp $symbols
     pp $identifiers
+
+    unless ($identifiers - $symbols.keys).empty?
+        $issues << { pos: nil, issue: "some identifiers not initialized" }
+    end
 
     # pp ast
     return text.length, tokens, ast, $issues
