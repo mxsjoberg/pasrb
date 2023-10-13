@@ -285,9 +285,9 @@ def parse_factor(tokens, tk_index)
 end
 
 def parse(text)
-    $symbols = Hash.new
-    $identifiers = Array.new
-    $issues = Array.new
+    # $symbols = Hash.new
+    # $identifiers = Array.new
+    # $issues = Array.new
     # tokens
     tokens = tokenize(text)
     # ast
@@ -306,7 +306,7 @@ def parse(text)
     end
 
     # pp ast
-    return text.length, tokens, ast, $symbols, $identifiers, $issues
+    return text.length, tokens, ast
 end
 
 def tokenize(text)
