@@ -51,3 +51,17 @@ while x<5 {
 }
 !x;
 ```
+
+This example simply increments and outputs `x`.
+
+```pascal
+x := 0;
+y := 0;
+
+?x;
+?y;
+
+!(x + y);
+```
+
+This example takes inputs from user (input boxes are automatically generated) and outputs the sum. User inputs currently persists until reloading page.
