@@ -16,19 +16,23 @@ end
 post "/update" do
     content_type :json
     request_body = JSON.parse(request.body.read)
+    # globals
+    $symbols = Hash.new
+    $identifiers = Array.new
+    $issues = Array.new
     # parse
-    characters, tokens, ast, symbols, identifiers, issues = parse(request_body["input"])
+    characters, tokens, ast = parse(request_body["input"])
     # interpret
-    result = interpret(ast)
+    output = interpret(ast)
     # return json
     {
         message: "ok",
         characters: characters,
         tokens: tokens.to_json,
         ast: ast.to_json,
-        symbols: symbols.to_json,
-        identifiers: identifiers.to_json,
-        issues: issues.to_json,
-        result: result
+        symbols: $symbols.to_json,
+        identifiers: $identifiers.to_json,
+        issues: $issues.to_json,
+        output: output
     }.to_json
 end
