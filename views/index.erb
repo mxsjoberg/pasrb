@@ -106,7 +106,14 @@
                     document.getElementById("identifiers").innerHTML = document.getElementById("identifiers").innerHTML + `<span class='token-wrapper'><span class='token-value'>${identifier}</span></span>, `;
                 });
                 // issues
-                document.getElementById("issues").innerHTML = data.issues;
+                // document.getElementById("issues").innerHTML = data.issues;
+                document.getElementById("issues").innerHTML = "";
+                JSON.parse(data.issues).forEach(issue => {
+                    if (issue.pos == null) {
+                        issue.pos = "*";
+                    }
+                    document.getElementById("issues").innerHTML = document.getElementById("issues").innerHTML + `<br> - <span class='token-wrapper'><span style='font-weight:bold;'>${issue.pos}</span> : ${issue.issue}</span>`;
+                });
                 // output
                 document.getElementById("result").innerHTML = data.result;
             }).catch(error => {
