@@ -6,13 +6,18 @@ require 'pp'
 
 # TODO: create my own "dialect"
 # - remove semicolons
+# - remove var declaration
 # - replace begin/end blocks with {}
 # - add 'end' to 'if' and 'while' statements WHY ISSUE WITH END BUT NOT }
 # - use ? for input and ! for output
 
-# statement ::= (identifier ':=' expr
-#             | 'if' condition ('then' | '{') statement ('end' | '}')
-#             | 'while' condition ('do' | '{') statement ('end' | '}'))*
+# statement ::= (
+#               identifier ':=' expr
+#               | '?' identifier
+#               | '!' expr
+#               | 'if' condition ('then' | '{') statement ('end' | '}')
+#               | 'while' condition ('do' | '{') statement ('end' | '}')
+#               )*
 
 # condition ::= 'odd' expr | expr ('=' | '<' | '>') expr
 # expr      ::= term (('+' | '-') term)*
@@ -22,16 +27,42 @@ require 'pp'
 def parse_statement(tokens, tk_index)
     statement = Array.new
 
-    while tk_index < tokens.length && (tokens[tk_index]["type".to_sym] == "identifier" || tokens[tk_index]["type".to_sym] == "keyword")
+    # while tk_index < tokens.length && (
+    #     tokens[tk_index]["type".to_sym] == "input" ||
+    #     tokens[tk_index]["type".to_sym] == "output" ||
+    #     tokens[tk_index]["type".to_sym] == "identifier" ||
+    #     tokens[tk_index]["type".to_sym] == "keyword"
+    # )
+    while tk_index < tokens.length && (["input", "output", "identifier", "keyword"].include? tokens[tk_index]["type".to_sym])
         tk_current = tokens[tk_index]
 
         case tk_current["type".to_sym]
+        when "input"
+            tk_index += 1
+            # TODO: how to get input from user?
+            begin
+                if tokens[tk_index]["type".to_sym] == "identifier"
+                    identifier = tokens[tk_index]["value".to_sym]
+                    unless $identifiers.include? identifier
+                        $identifiers << identifier
+                    end
+                    tk_index += 1
+                    statement << ["input", identifier]
+                end
+            rescue
+                $issues << { pos: tk_index, issue: "expected identifier after '?'" }
+            end
         when "identifier"
             tk_index += 1
             identifier = tk_current["value".to_sym]
+            unless $identifiers.include? identifier
+                $identifiers << identifier
+            end
             begin
                 if tokens[tk_index]["type".to_sym] == "assignment"
                     tk_index += 1
+                    # add to symbols (just identifier not expression)
+                    $symbols[identifier.to_sym] = nil
                     # expr
                     expr, tk_index = parse_expr(tokens, tk_index)
                     statement << ["assignment", [identifier, expr]]
@@ -63,6 +94,32 @@ def parse_statement(tokens, tk_index)
                     if tokens[tk_index]["value".to_sym] == "end" || tokens[tk_index]["value".to_sym] == "}"
                         tk_index += 1
                     end
+                rescue
+                    $issues << { pos: tk_index, issue: "expected 'end' or closing braces" }
+                end
+            when "while"
+                tk_index += 1
+                begin
+                    # condition
+                    condition, tk_index = parse_condition(tokens, tk_index)
+                    begin 
+                        if tokens[tk_index]["value".to_sym] == "do" || tokens[tk_index]["value".to_sym] == "{"
+                            tk_index += 1
+                        end
+                    rescue
+                        $issues << { pos: tk_index, issue: "expected 'do' or opening braces after condition" }
+                    end
+                rescue
+                    $issues << { pos: tk_index, issue: "expected condition after 'while' keyword" }
+                end
+                statements, tk_index = parse_statement(tokens, tk_index)
+                statement << ["while", [condition, statements]]
+                # closing braces
+                begin
+                    if tokens[tk_index]["value".to_sym] == "end" || tokens[tk_index]["value".to_sym] == "}"
+                        tk_index += 1
+                    end
+
                 rescue
                     $issues << { pos: tk_index, issue: "expected 'end' or closing braces" }
                 end
@@ -148,7 +205,7 @@ def parse_term(tokens, tk_index)
     # factor
     factor, tk_index = parse_factor(tokens, tk_index)
     term = factor
-    # (* | /)
+    
     while tk_index < tokens.length && (tokens[tk_index]["value".to_sym] == "*" || tokens[tk_index]["value".to_sym] == "/")
         tk_current = tokens[tk_index]
         tk_index += 1
@@ -171,9 +228,16 @@ def parse_factor(tokens, tk_index)
 
     case tk_current["type".to_sym]
     when "identifier"
-        factor = $symbols[tk_current["value".to_sym].to_sym]
-        if factor.nil?
-            $issues << { pos: tk_index, issue: "identifier not found" }
+        # TODO: this should be in interpreter
+        # factor = $symbols[tk_current["value".to_sym].to_sym]
+        # if factor.nil?
+        #     factor = "0"
+        #     $issues << { pos: tk_index, issue: "identifier not found" }
+        # end
+        identifier = tk_current["value".to_sym]
+        factor = identifier
+        unless $identifiers.include? identifier
+            $identifiers << identifier
         end
     when "number"
         factor = tk_current["value".to_sym]
@@ -199,58 +263,17 @@ end
 def parse(text)
     $issues = Array.new
     $symbols = Hash.new
+    $identifiers = Array.new
     # tokens
     tokens = tokenize(text)
-    # tokens = Array.new
-    # ch_index = 0
-
-    # while ch_index < text.length
-    #     ch_current = text[ch_index]
-    #     case ch_current
-    #     when /[\s\t\r\n]/
-    #     when /\d/
-    #         number = ch_current
-    #         while /\d/.match?(text[ch_index + 1])
-    #             number << text[ch_index + 1]
-    #             ch_index += 1
-    #         end
-    #         tokens << { type: "number", value: number, pos: ch_index }
-    #     when /[\+\-\*\/]/
-    #         tokens << { type: "operator", value: ch_current, pos: ch_index }
-    #     when /[\=\<\>]/
-    #         tokens << { type: "comparison", value: ch_current, pos: ch_index }
-    #     when /[\(\)]/
-    #         tokens << { type: "parentheses", value: ch_current, pos: ch_index }
-    #     when /\:/
-    #         if text[ch_index + 1] == "="
-    #             tokens << { type: "assignment", value: ":=", pos: ch_index }
-    #         else
-    #             $issues << { pos: ch_index, issue: "expecting '=' after ':'" }
-    #         end
-    #     when /[a-zA-Z]/
-    #         identifier = ch_current
-    #         while /[a-zA-Z]/.match?(text[ch_index + 1])
-    #             identifier << text[ch_index + 1]
-    #             ch_index += 1
-    #         end
-    #         if identifier == "odd" || identifier == "if" || identifier == "then" || identifier == "while" || identifier == "do"
-    #             tokens << { type: "keyword", value: identifier, pos: ch_index }
-    #         else
-    #             tokens << { type: "identifier", value: identifier, pos: ch_index }
-    #         end
-    #     else
-    #         $issues << { pos: ch_index, issue: "unknown character" }
-    #     end
-
-    #     ch_index += 1
-    # end
-
     # ast
     ast = Array.new
     tk_index = 0
+    # parse
+    ast, tk_index = parse_statement(tokens, tk_index)
 
-    expr, tk_index = parse_statement(tokens, tk_index)
-    ast = expr
+    pp $symbols
+    pp $identifiers
 
     # pp ast
     return text.length, tokens, ast, $issues
@@ -285,6 +308,12 @@ def tokenize(text)
         # braces
         when /[\{\}]/
             tokens << { type: "braces", value: ch_current, pos: ch_index }
+        # input
+        when /\?/
+            tokens << { type: "input", value: nil, pos: ch_index }
+        # output
+        when /\!/
+            tokens << { type: "output", value: nil, pos: ch_index }
         # assignment
         when /\:/
             if text[ch_index + 1] == "="
