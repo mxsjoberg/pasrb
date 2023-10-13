@@ -5,16 +5,16 @@ require 'pp'
 # https://en.wikipedia.org/wiki/PL/0
 
 # TODO: create my own "dialect"
-# - remove semicolons
+# - replace semicolons with newline?
 # - remove var declaration
 # - add option to use braces instead of begin/end
 # - add 'end' or closing brace to 'if' and 'while' statements
 # - use ? for input and ! for output
 
 # statement ::= (
-#               identifier ':=' expr
-#               | '?' identifier
-#               | '!' expr
+#               identifier ':=' expr ';'
+#               | '?' identifier ';'
+#               | '!' expr ';'
 #               | 'if' condition ('then' | '{') statement ('end' | '}')
 #               | 'while' condition ('do' | '{') statement ('end' | '}')
 #               )*
@@ -26,28 +26,16 @@ require 'pp'
 def parse_statement(tokens, tk_index)
     statement = Array.new
 
-    while tk_index < tokens.length && ["input", "output", "identifier", "keyword"].include? tokens[tk_index]["type".to_sym]
+    while tk_index < tokens.length && (["input", "output", "identifier", "keyword"].include? tokens[tk_index]["type".to_sym])
         tk_current = tokens[tk_index]
         
         case tk_current["type".to_sym]
-        when "input"
-            tk_index += 1
-            # TODO: how to get input from user?
-            begin
-                if tokens[tk_index]["type".to_sym] == "identifier"
-                    identifier = tokens[tk_index]["value".to_sym]
-                    unless $identifiers.include? identifier
-                        $identifiers << identifier
-                    end
-                    tk_index += 1
-                    statement << ["input", identifier]
-                end
-            rescue
-                $issues << { pos: tk_index, issue: "expected identifier after '?'" }
-            end
         when "identifier"
             tk_index += 1
             identifier = tk_current["value".to_sym]
+            # unless $identifiers.include? identifier
+            #     $identifiers << identifier
+            # end
             begin
                 if tokens[tk_index]["type".to_sym] == "assignment"
                     tk_index += 1
@@ -56,9 +44,34 @@ def parse_statement(tokens, tk_index)
                     # expr
                     expr, tk_index = parse_expr(tokens, tk_index)
                     statement << ["assignment", [identifier, expr]]
+                    # semicolon
+                    begin
+                        if tokens[tk_index]["type".to_sym] == "semicolon"
+                            tk_index += 1
+                        else
+                            raise
+                        end
+                    rescue
+                        $issues << { pos: tk_index, issue: "expected ';' after assignment statement" }
+                    end
                 end
             rescue
                 $issues << { pos: tk_index, issue: "expected ':=' after identifier" }
+            end
+        when "input"
+            tk_index += 1
+            # TODO: how to get input from user?
+            begin
+                if tokens[tk_index]["type".to_sym] == "identifier"
+                    identifier = tokens[tk_index]["value".to_sym]
+                    # unless $identifiers.include? identifier
+                    #     $identifiers << identifier
+                    # end
+                    tk_index += 1
+                    statement << ["input", identifier]
+                end
+            rescue
+                $issues << { pos: tk_index, issue: "expected identifier after '?'" }
             end
         when "keyword"
             case tk_current["value".to_sym]
@@ -174,7 +187,8 @@ def parse_expr(tokens, tk_index)
     # term
     term, tk_index = parse_term(tokens, tk_index)
     expr = term
-    while tk_index < tokens.length && ["+", "-"].includes? tokens[tk_index]["value".to_sym]
+
+    while tk_index < tokens.length && (["+", "-"].include? tokens[tk_index]["value".to_sym])
         tk_current = tokens[tk_index]
         tk_index += 1
         # term
@@ -195,7 +209,7 @@ def parse_term(tokens, tk_index)
     factor, tk_index = parse_factor(tokens, tk_index)
     term = factor
     
-    while tk_index < tokens.length && ["*", "/"].includes? tokens[tk_index]["value".to_sym]
+    while tk_index < tokens.length && (["*", "/"].include? tokens[tk_index]["value".to_sym])
         tk_current = tokens[tk_index]
         tk_index += 1
         # factor
@@ -213,7 +227,7 @@ end
 def parse_factor(tokens, tk_index)
     factor = Array.new
     tk_current = tokens[tk_index]
-    tk_index += 1
+    tk_index += 1 # ;
 
     case tk_current["type".to_sym]
     when "identifier"
@@ -255,10 +269,12 @@ def parse(text)
     # parse
     ast, tk_index = parse_statement(tokens, tk_index)
 
-    pp $symbols
-    pp $identifiers
+    # pp $symbols
+    # pp $identifiers
 
-    unless ($identifiers - $symbols.keys).empty?
+    # report uninitialized but used identifiers
+    # pp $identifiers - $symbols.keys.map { |identifier| identifier.to_s }
+    unless ($identifiers - $symbols.keys.map { |identifier| identifier.to_s }).empty?
         $issues << { pos: nil, issue: "some identifiers not initialized" }
     end
 
@@ -309,6 +325,9 @@ def tokenize(text)
             else
                 $issues << { pos: ch_index, issue: "expecting '=' after ':'" }
             end
+        # semicolon
+        when /\;/
+            tokens << { type: "semicolon", value: ch_current, pos: ch_index }
         # identifier
         when /[a-zA-Z]/
             identifier = ch_current
