@@ -33,9 +33,6 @@ def parse_statement(tokens, tk_index)
         when "identifier"
             tk_index += 1
             identifier = tk_current["value".to_sym]
-            # unless $identifiers.include? identifier
-            #     $identifiers << identifier
-            # end
             begin
                 if tokens[tk_index]["type".to_sym] == "assignment"
                     tk_index += 1
@@ -64,14 +61,42 @@ def parse_statement(tokens, tk_index)
             begin
                 if tokens[tk_index]["type".to_sym] == "identifier"
                     identifier = tokens[tk_index]["value".to_sym]
-                    # unless $identifiers.include? identifier
-                    #     $identifiers << identifier
-                    # end
+                    unless $identifiers.include? identifier
+                        $identifiers << identifier
+                    end
                     tk_index += 1
                     statement << ["input", identifier]
+                    # semicolon
+                    begin
+                        if tokens[tk_index]["type".to_sym] == "semicolon"
+                            tk_index += 1
+                        else
+                            raise
+                        end
+                    rescue
+                        $issues << { pos: tk_index, issue: "expected ';' after input statement" }
+                    end
                 end
             rescue
                 $issues << { pos: tk_index, issue: "expected identifier after '?'" }
+            end
+        when "output"
+            tk_index += 1
+            begin
+                expr, tk_index = parse_expr(tokens, tk_index)
+                statement << ["output", expr]
+                # semicolon
+                begin
+                    if tokens[tk_index]["type".to_sym] == "semicolon"
+                        tk_index += 1
+                    else
+                        raise
+                    end
+                rescue
+                    $issues << { pos: tk_index, issue: "expected ';' after output statement" }
+                end
+            rescue
+                $issues << { pos: tk_index, issue: "expected expression after '!'" }
             end
         when "keyword"
             case tk_current["value".to_sym]
@@ -258,9 +283,9 @@ def parse_factor(tokens, tk_index)
 end
 
 def parse(text)
-    $issues = Array.new
     $symbols = Hash.new
     $identifiers = Array.new
+    $issues = Array.new
     # tokens
     tokens = tokenize(text)
     # ast
@@ -279,7 +304,7 @@ def parse(text)
     end
 
     # pp ast
-    return text.length, tokens, ast, $issues
+    return text.length, tokens, ast, $symbols, $identifiers, $issues
 end
 
 def tokenize(text)
@@ -313,10 +338,10 @@ def tokenize(text)
             tokens << { type: "braces", value: ch_current, pos: ch_index }
         # input
         when /\?/
-            tokens << { type: "input", value: nil, pos: ch_index }
+            tokens << { type: "input", value: ch_current, pos: ch_index }
         # output
         when /\!/
-            tokens << { type: "output", value: nil, pos: ch_index }
+            tokens << { type: "output", value: ch_current, pos: ch_index }
         # assignment
         when /\:/
             if text[ch_index + 1] == "="
