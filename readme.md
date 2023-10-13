@@ -41,3 +41,13 @@ term = factor {('*' | '/') factor};
 
 factor = identifier | number | '(' expr ')';
 ```
+
+## Examples
+
+```pascal
+x := 0;
+while x<5 {
+    x := x + 1;
+}
+!x;
+```
