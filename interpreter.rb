@@ -1,9 +1,8 @@
 # interpreter.rb
 
-# TODO: add rest of statements
+# TODO: add rest of grammar
 
 def interpret(ast)
-    # result = nil
     node = ast
 
     if node.kind_of?(Array)
@@ -14,7 +13,7 @@ def interpret(ast)
         right = nil
     end
 
-    # TODO: traverse nested like this or change how parser build ast?
+    # traverse nested like this or change how parser build ast?
     if left.kind_of?(Array)
         if left.length == 1
             left = left[0]
@@ -54,6 +53,4 @@ def interpret(ast)
     when /[a-zA-Z]/
         return $symbols[left.to_sym]
     end
-
-    # result ? result : "nil"
 end
