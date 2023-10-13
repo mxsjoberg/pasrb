@@ -4,6 +4,8 @@ require 'pp'
 
 # https://en.wikipedia.org/wiki/PL/0
 
+# TODO: replace ch_index/tk_index in issues woth line + col (or add more info? previous token or current token?)
+
 # TODO: create my own "dialect"
 # - replace semicolons with newline?
 # - remove var declaration
