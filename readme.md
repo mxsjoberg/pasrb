@@ -1,5 +1,7 @@
 # Pascal in Ruby
 
+![pascal_in_ruby_v2.png](pascal_in_ruby_v2.png)
+
 Blog post: [michaelsjoberg.com/posts/writing-an-interactive-interpreter-in-ruby](https://michaelsjoberg.com/posts/writing-an-interactive-interpreter-in-ruby)
 
 ## Grammar (PL/0)
