@@ -1,6 +1,6 @@
 # parser.rb
 
-# TODO: replace ch_index/tk_index in issues woth line + col (or add more info? previous token or current token?)
+# TODO: replace ch_index/tk_index in issues with line + col (or add more info? previous token or current token?)
 
 require 'pp'
 
@@ -38,12 +38,14 @@ def parse_statement(tokens, tk_index)
             end
         when "input"
             tk_index += 1
-            # TODO: how to get input from user?
             begin
                 if tokens[tk_index]["type".to_sym] == "identifier"
                     identifier = tokens[tk_index]["value".to_sym]
                     unless $identifiers.include? identifier
                         $identifiers << identifier
+                        unless $input.keys.map { |identifier| identifier.to_s }.include? identifier
+                            $input[identifier.to_sym] = nil
+                        end
                     end
                     tk_index += 1
                     statement << ["input", identifier]
