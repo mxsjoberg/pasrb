@@ -92,10 +92,22 @@
                 JSON.parse(data.tokens).forEach(token => {
                     document.getElementById("tokens").innerHTML = document.getElementById("tokens").innerHTML + `<span class='token-wrapper'><span class='token-value'>${token.value}</span> ${token.type}</span>, `;
                 });
+                // ast
                 document.getElementById("ast").innerHTML = data.ast;
-                document.getElementById("symbols").innerHTML = data.symbols;
-                document.getElementById("identifiers").innerHTML = data.identifiers;
+                // document.getElementById("ast").innerHTML = "<br>" + formatTree(data.ast);
+                // symbols
+                document.getElementById("symbols").innerHTML = "";
+                Object.entries(JSON.parse(data.symbols)).forEach((symbol) => {
+                    document.getElementById("symbols").innerHTML = document.getElementById("symbols").innerHTML + `<span class='token-wrapper'><span class='token-value'>${symbol[0]}</span> : ${symbol[1]}</span>, `;
+                });
+                // identifiers
+                document.getElementById("identifiers").innerHTML = "";
+                JSON.parse(data.identifiers).forEach(identifier => {
+                    document.getElementById("identifiers").innerHTML = document.getElementById("identifiers").innerHTML + `<span class='token-wrapper'><span class='token-value'>${identifier}</span></span>, `;
+                });
+                // issues
                 document.getElementById("issues").innerHTML = data.issues;
+                // output
                 document.getElementById("result").innerHTML = data.result;
             }).catch(error => {
                 console.error(error);
@@ -113,6 +125,32 @@
                 this.selectionStart = this.selectionEnd = start + 1;
             }
         });
+        // function to pretty print ast
+        function formatTree(input, indentLevel = 0) {
+            const indent = "<span style='min-width:20px;display:inline-block;'></span>".repeat(indentLevel);
+            let result = '';
+            let currentIndex = 0;
+            while (currentIndex < input.length) {
+                const char = input[currentIndex];
+                if (char === '[') {
+                    result += `${indent}${char}<br>`;
+                    indentLevel++;
+                    result += "<span style='min-width:20px;display:inline-block;'></span>".repeat(indentLevel);
+                } else if (char === ']') {
+                    indentLevel--;
+                    result += `<br>${"<span style='min-width:20px;display:inline-block;'></span>".repeat(indentLevel)}${char}`;
+                } else if (char === ',') {
+                    result += ',<br>';
+                    result += "<span style='min-width:20px;display:inline-block;'></span>".repeat(indentLevel);
+                } else if (char === ' ' || char === '\n' || char === '\t') {
+                    // pass
+                } else {
+                    result += char;
+                }
+                currentIndex++;
+            }
+            return result;
+        }
     </script>
 </body>
 </html>
