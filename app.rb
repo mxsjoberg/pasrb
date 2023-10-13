@@ -20,10 +20,13 @@ post "/update" do
     $symbols = Hash.new
     $identifiers = Array.new
     $issues = Array.new
+    $output = Array.new
     # parse
     characters, tokens, ast = parse(request_body["input"])
     # interpret
-    output = interpret(ast)
+    ast.each do |branch|
+        interpret(branch)
+    end
     # return json
     {
         message: "ok",
@@ -33,6 +36,6 @@ post "/update" do
         symbols: $symbols.to_json,
         identifiers: $identifiers.to_json,
         issues: $issues.to_json,
-        output: output
+        output: $output
     }.to_json
 end
