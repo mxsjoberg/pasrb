@@ -65,7 +65,7 @@
     <p><strong>Symbols:</strong> <span id="symbols">[]</span></p>
     <p><strong>Identifiers:</strong> <span id="identifiers">[]</span></p>
     <p><strong>Issues:</strong> <span id="issues">[]</span></p>
-    <p><strong>Output:</strong> <span id="result">nil</span></p>
+    <p><strong>Output:</strong> <span id="output"></span></p>
     <!-- update -->
     <script>
         // editor
@@ -112,10 +112,10 @@
                     if (issue.pos == null) {
                         issue.pos = "*";
                     }
-                    document.getElementById("issues").innerHTML = document.getElementById("issues").innerHTML + `<br> - <span class='token-wrapper'><span style='font-weight:bold;'>${issue.pos}</span> : ${issue.issue}</span>`;
+                    document.getElementById("issues").innerHTML = document.getElementById("issues").innerHTML + `<br> - Token#<span class='token-wrapper'><span style='font-weight:bold;'>${issue.pos}</span> : ${issue.issue}</span>`;
                 });
                 // output
-                document.getElementById("result").innerHTML = data.result;
+                document.getElementById("output").innerHTML = data.output;
             }).catch(error => {
                 console.error(error);
             });
