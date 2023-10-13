@@ -24,10 +24,11 @@ def parse_statement(tokens, tk_index)
 
     while tk_index < tokens.length && (tokens[tk_index]["type".to_sym] == "identifier" || tokens[tk_index]["type".to_sym] == "keyword")
         tk_current = tokens[tk_index]
-        tk_index += 1
+        # tk_index += 1
 
         case tk_current["type".to_sym]
         when "identifier"
+            tk_index += 1
             identifier = tk_current["value".to_sym]
             begin
                 if tokens[tk_index]["type".to_sym] == "assignment"
@@ -42,6 +43,7 @@ def parse_statement(tokens, tk_index)
         when "keyword"
             case tk_current["value".to_sym]
             when "if"
+                tk_index += 1
                 begin
                     # condition
                     condition, tk_index = parse_condition(tokens, tk_index)
@@ -66,6 +68,8 @@ def parse_statement(tokens, tk_index)
                 rescue
                     $issues << { pos: tk_index, issue: "expected 'end' or closing braces" }
                 end
+            when "end"
+                break
             end
         end
     end
