@@ -1,5 +1,7 @@
 # interpreter.rb
 
+# TODO: add rest of statements
+
 def interpret(ast)
     result = nil
     node = ast
@@ -23,7 +25,10 @@ def interpret(ast)
         result = interpret(right[0]).to_i / interpret(right[1]).to_i
     when /\d/
         return left
+    when "assignment"
+
     end
 
-    result ? result : "nil"
+    # result ? result : "nil"
+    result
 end
