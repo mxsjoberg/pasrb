@@ -6,25 +6,6 @@ require 'pp'
 
 # TODO: replace ch_index/tk_index in issues woth line + col (or add more info? previous token or current token?)
 
-# TODO: create my own "dialect"
-# - replace semicolons with newline?
-# - remove var declaration
-# - add option to use braces instead of begin/end
-# - add 'end' or closing brace to 'if' and 'while' statements
-# - use ? for input and ! for output
-
-# statement ::= (
-#               identifier ':=' expr ';'
-#               | '?' identifier ';'
-#               | '!' expr ';'
-#               | 'if' condition ('then' | '{') statement ('end' | '}')
-#               | 'while' condition ('do' | '{') statement ('end' | '}')
-#               )*
-# condition ::= 'odd' expr | expr ('=' | '<' | '>') expr
-# expr      ::= term (('+' | '-') term)*
-# term      ::= factor (('*' | '/') factor)*
-# factor    ::= identifier | number | '(' expr ')'
-
 def parse_statement(tokens, tk_index)
     statement = Array.new
 
