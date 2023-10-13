@@ -17,9 +17,18 @@ post "/update" do
     content_type :json
     request_body = JSON.parse(request.body.read)
     # parse
-    characters, tokens, ast, issues = parse(request_body["input"])
+    characters, tokens, ast, symbols, identifiers, issues = parse(request_body["input"])
     # interpret
     result = interpret(ast)
     # return json
-    { message: "ok", characters: characters, tokens: tokens.to_json, ast: ast.to_json, issues: issues.to_json, result: result }.to_json
+    {
+        message: "ok",
+        characters: characters,
+        tokens: tokens.to_json,
+        ast: ast.to_json,
+        symbols: symbols.to_json,
+        identifiers: identifiers.to_json,
+        issues: issues.to_json,
+        result: result
+    }.to_json
 end
