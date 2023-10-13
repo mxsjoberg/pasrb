@@ -7,8 +7,8 @@ require 'pp'
 # TODO: create my own "dialect"
 # - remove semicolons
 # - remove var declaration
-# - replace begin/end blocks with {}
-# - add 'end' to 'if' and 'while' statements WHY ISSUE WITH END BUT NOT }
+# - add option to use braces instead of begin/end
+# - add 'end' or closing brace to 'if' and 'while' statements
 # - use ? for input and ! for output
 
 # statement ::= (
@@ -18,7 +18,6 @@ require 'pp'
 #               | 'if' condition ('then' | '{') statement ('end' | '}')
 #               | 'while' condition ('do' | '{') statement ('end' | '}')
 #               )*
-
 # condition ::= 'odd' expr | expr ('=' | '<' | '>') expr
 # expr      ::= term (('+' | '-') term)*
 # term      ::= factor (('*' | '/') factor)*
@@ -27,14 +26,7 @@ require 'pp'
 def parse_statement(tokens, tk_index)
     statement = Array.new
 
-    # while tk_index < tokens.length && (
-    #     tokens[tk_index]["type".to_sym] == "input" ||
-    #     tokens[tk_index]["type".to_sym] == "output" ||
-    #     tokens[tk_index]["type".to_sym] == "identifier" ||
-    #     tokens[tk_index]["type".to_sym] == "keyword"
-    # )
-    while tk_index < tokens.length && (["input", "output", "identifier", "keyword"].include? tokens[tk_index]["type".to_sym])
-    # while tk_index < tokens.length
+    while tk_index < tokens.length && ["input", "output", "identifier", "keyword"].include? tokens[tk_index]["type".to_sym]
         tk_current = tokens[tk_index]
         
         case tk_current["type".to_sym]
@@ -56,13 +48,10 @@ def parse_statement(tokens, tk_index)
         when "identifier"
             tk_index += 1
             identifier = tk_current["value".to_sym]
-            # unless $identifiers.include? identifier
-            #     $identifiers << identifier
-            # end
             begin
                 if tokens[tk_index]["type".to_sym] == "assignment"
                     tk_index += 1
-                    # add to symbols (just identifier not expression)
+                    # add to symbols
                     $symbols[identifier.to_sym] = nil
                     # expr
                     expr, tk_index = parse_expr(tokens, tk_index)
@@ -125,7 +114,7 @@ def parse_statement(tokens, tk_index)
                     $issues << { pos: tk_index, issue: "expected 'end' or closing braces" }
                 end
             when "end"
-                # break while at 'end'
+                # break while at 'end' without incrementing tk_index
                 break
             end
         end
@@ -185,8 +174,7 @@ def parse_expr(tokens, tk_index)
     # term
     term, tk_index = parse_term(tokens, tk_index)
     expr = term
-    # (+ | -)
-    while tk_index < tokens.length && (tokens[tk_index]["value".to_sym] == "+" || tokens[tk_index]["value".to_sym] == "-")
+    while tk_index < tokens.length && ["+", "-"].includes? tokens[tk_index]["value".to_sym]
         tk_current = tokens[tk_index]
         tk_index += 1
         # term
@@ -207,7 +195,7 @@ def parse_term(tokens, tk_index)
     factor, tk_index = parse_factor(tokens, tk_index)
     term = factor
     
-    while tk_index < tokens.length && (tokens[tk_index]["value".to_sym] == "*" || tokens[tk_index]["value".to_sym] == "/")
+    while tk_index < tokens.length && ["*", "/"].includes? tokens[tk_index]["value".to_sym]
         tk_current = tokens[tk_index]
         tk_index += 1
         # factor
