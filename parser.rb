@@ -1,10 +1,8 @@
 # parser.rb
 
-require 'pp'
-
-# https://en.wikipedia.org/wiki/PL/0
-
 # TODO: replace ch_index/tk_index in issues woth line + col (or add more info? previous token or current token?)
+
+require 'pp'
 
 def parse_statement(tokens, tk_index)
     statement = Array.new
@@ -357,4 +355,3 @@ def tokenize(text)
 
     tokens
 end
-
