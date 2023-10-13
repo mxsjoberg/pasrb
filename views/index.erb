@@ -58,6 +58,7 @@
     <p><a href="https://github.com/mrsjoberg/pascal-in-ruby">github.com/mrsjoberg/pascal-in-ruby</a></p>
     <!-- editor -->
     <textarea id="editor"></textarea>
+    <div id="inputs"></div>
     <!-- outputs -->
     <p><strong>Characters:</strong> <span id="characters">0</span></p>
     <p><strong>Tokens:</strong> <span id="tokens">[]</span></p>
@@ -71,20 +72,31 @@
         // editor
         const editor = document.getElementById("editor");
         editor.addEventListener("input", function() {
-            const input = editor.value;
+            const text = editor.value;
             // send to server
             fetch("/update", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ input }),
+                body: JSON.stringify({ text }),
             }).then(response => {
                 if (!response.ok) {
                     throw new Error("something went wrong?")
                 }
                 return response.json();
             }).then(data => {
+                // input
+                // console.log(data.input);
+                document.getElementById("inputs").innerHTML = "";
+                try {
+                    Object.entries(JSON.parse(data.input)).forEach(identifier => {
+                        // append input to inputs
+                        document.getElementById("inputs").innerHTML += `<input id="input-${identifier[0]}" placeholder='${identifier[0]}' value='${identifier[1]}'></input>`;
+                    });
+                } catch {
+                    // pass
+                }
                 // characters
                 document.getElementById("characters").innerHTML = data.characters;
                 // tokens
@@ -116,6 +128,38 @@
                 });
                 // output
                 document.getElementById("output").innerHTML = data.output;
+            }).then(() => {
+                // event listeners on inputs
+                document.querySelectorAll("input").forEach(input => {
+                    input.addEventListener("input", event => {
+                        // console.log(input.id.split("-")[1]);
+                        const identifier = input.id.split("-")[1];
+                        const text = input.value;
+                        // send to server
+                        fetch("/input", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({ identifier, text }),
+                        }).then(response => {
+                            if (!response.ok) {
+                                throw new Error("something went wrong?")
+                            }
+                            return response.json();
+                        }).then(data => {
+                            // symbols
+                            document.getElementById("symbols").innerHTML = "";
+                            Object.entries(JSON.parse(data.symbols)).forEach((symbol) => {
+                                document.getElementById("symbols").innerHTML = document.getElementById("symbols").innerHTML + `<span class='token-wrapper'><span class='token-value'>${symbol[0]}</span> : ${symbol[1]}</span>, `;
+                            });
+                            // output
+                            document.getElementById("output").innerHTML = data.output;
+                        }).catch(error => {
+                            console.error(error);
+                        });
+                    });
+                });
             }).catch(error => {
                 console.error(error);
             });
