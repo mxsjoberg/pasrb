@@ -1,4 +1,4 @@
-![pascal-in-ruby-image.png](pascal-in-ruby-image.png =250x)
+<img src="/pascal-in-ruby-image.png" width="200">
 
 # Pascal in Ruby
 
