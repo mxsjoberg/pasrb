@@ -8,6 +8,8 @@ require_relative "interpreter"
 
 set :views, File.join(settings.root, "views")
 
+# run: ruby app.rb
+
 get "/" do
     $input = Hash.new
     @title = "Pascal in Ruby"
