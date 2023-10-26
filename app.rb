@@ -1,7 +1,7 @@
 require "sinatra"
 require "json"
 # auto-reload
-require "sinatra/reloader"
+# require "sinatra/reloader"
 
 require_relative "parser"
 require_relative "interpreter"
