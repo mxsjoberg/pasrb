@@ -4,6 +4,8 @@
 
 source "https://rubygems.org"
 
+ruby "3.0.0"
+
 # gem install --local puma-6.4.0.gem
 # gem install --local sinatra-3.1.0.gem
 # gem install --local json-2.6.3.gem
