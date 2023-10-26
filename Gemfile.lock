@@ -1,0 +1,23 @@
+GEM
+  specs:
+    mustermann (3.0.0)
+      ruby2_keywords (~> 0.0.1)
+    rack (2.2.8)
+    rack-protection (3.1.0)
+      rack (~> 2.2, >= 2.2.4)
+    ruby2_keywords (0.0.5)
+    sinatra (3.1.0)
+      mustermann (~> 3.0)
+      rack (~> 2.2, >= 2.2.4)
+      rack-protection (= 3.1.0)
+      tilt (~> 2.0)
+    tilt (2.3.0)
+
+PLATFORMS
+  x86_64-darwin-22
+
+DEPENDENCIES
+  sinatra
+
+BUNDLED WITH
+   2.2.3
