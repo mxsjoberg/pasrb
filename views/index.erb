@@ -9,7 +9,7 @@
     <link rel='stylesheet' href='//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack-subset.css'>
     <style>
         ::selection {
-            background: #FD3E3E;
+            background: #B12B2B;
         }
         body {
             background: lightcoral;
@@ -18,13 +18,16 @@
             font-size: 18px;
             padding: 2rem;
         }
+        h1 {
+            display: inline-block;
+        }
         h1,
         p {
             padding-left: 1rem;
             padding-right: 1rem;
         }
         a {
-            color: white;
+            color: #B12B2B;
             font-weight: bold;
         }
         textarea {
@@ -57,6 +60,23 @@
         input:focus {
             border: 2px solid #FD3E3E;
         }
+        select {
+            background: white;
+            color: black;
+            font-family: "Hack", monospace;
+            font-size: 18px;
+            border: 2px solid black;
+            padding: 1rem;
+            box-sizing: border-box;
+            border-radius: 1rem;
+            outline: none !important;
+            float: right;
+            margin-block-start: 0.67em;
+            margin-block-end: 0.67em;
+        }
+        select:focus {
+            border: 2px solid #FD3E3E;
+        }
         span.token-wrapper {
             line-height: 1.5;
         }
@@ -65,11 +85,23 @@
             border: 1px solid black;
             padding: 1px 4px;
         }
+        p#footer {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <h1><%= @title %></h1>
-    <p><a href="https://github.com/mrsjoberg/pascal-in-ruby">github.com/mrsjoberg/pascal-in-ruby</a></p>
+    <div>
+        <h1><%= @title %></h1>
+        <!-- select box with example programs -->
+        <select id="select-example">
+            <option value="0">Select example program</option>
+            <option value="1">While loop</option>
+            <option value="2">Inputs</option>
+        </select>
+    </div>
     <!-- editor -->
     <textarea id="editor"></textarea>
     <div id="inputs"></div>
@@ -81,39 +113,58 @@
     <p><strong>Identifiers:</strong> <span id="identifiers">[]</span></p>
     <p><strong>Issues:</strong> <span id="issues">[]</span></p>
     <p><strong>Output:</strong> <span id="output"></span></p>
+    <!-- footer -->
+    <p id="footer"><a href="https://github.com/mxsjoberg/pascal-in-ruby">github.com/mxsjoberg/pascal-in-ruby</a></p>
     <!-- update -->
     <script>
-        // editor
-        const editor = document.getElementById("editor");
-        editor.addEventListener("input", function() {
+        // handle select
+        document.getElementById("select-example").addEventListener("change", function() {
+            // get value
+            const value = document.getElementById("select-example").value;
+            // set editor
+            if (value == 0) { document.getElementById("editor").value = "" }
+            else if (value == 1) { document.getElementById("editor").value =
+`x := 0;
+while x<5 {
+    x := x + 1;
+}
+!x;`
+                ;
+            }
+            else if (value == 2) { document.getElementById("editor").value =
+`x := 0;
+y := 0;
+
+?x;
+?y;
+
+!(x + y);`
+                ;
+            }
+            // update
+            update();
+        });
+        // update
+        function update() {
             const text = editor.value;
             // send to server
             fetch("/update", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ text }),
             }).then(response => {
-                if (!response.ok) {
-                    throw new Error("something went wrong?")
-                }
+                if (!response.ok) { throw new Error("something went wrong?") }
                 return response.json();
             }).then(data => {
                 // input
-                // console.log(data.input);
                 document.getElementById("inputs").innerHTML = "";
                 try {
                     Object.entries(JSON.parse(data.input)).forEach(identifier => {
-                        if (identifier[1] == null) {
-                            identifier[1] = "";
-                        }
+                        if (identifier[1] == null) { identifier[1] = "" }
                         // append input to inputs
                         document.getElementById("inputs").innerHTML += `<input id="input-${identifier[0]}" placeholder='${identifier[0]}' value='${identifier[1]}'></input>`;
                     });
-                } catch {
-                    // pass
-                }
+                } catch { /* pass */ }
                 // characters
                 document.getElementById("characters").innerHTML = data.characters;
                 // tokens
@@ -138,9 +189,7 @@
                 // document.getElementById("issues").innerHTML = data.issues;
                 document.getElementById("issues").innerHTML = "";
                 JSON.parse(data.issues).forEach(issue => {
-                    if (issue.pos == null) {
-                        issue.pos = "*";
-                    }
+                    if (issue.pos == null) { issue.pos = "*" }
                     document.getElementById("issues").innerHTML = document.getElementById("issues").innerHTML + `<br> - Token#<span class='token-wrapper'><span style='font-weight:bold;'>${issue.pos}</span> : ${issue.issue}</span>`;
                 });
                 // output
@@ -149,7 +198,6 @@
                 // event listeners on inputs
                 document.querySelectorAll("input").forEach(input => {
                     input.addEventListener("input", event => {
-                        // console.log(input.id.split("-")[1]);
                         const identifier = input.id.split("-")[1];
                         const text = input.value;
                         // send to server
@@ -172,15 +220,14 @@
                             });
                             // output
                             document.getElementById("output").innerHTML = data.output;
-                        }).catch(error => {
-                            console.error(error);
-                        });
+                        }).catch(error => { console.error(error) });
                     });
                 });
-            }).catch(error => {
-                console.error(error);
-            });
-        });
+            }).catch(error => { console.error(error) });
+        };
+        // editor
+        const editor = document.getElementById("editor");
+        editor.addEventListener("input", function() { update() });
         // capture tab in textarea https://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea
         document.getElementById('editor').addEventListener('keydown', function(e) {
             if (e.key == 'Tab') {
@@ -194,31 +241,31 @@
             }
         });
         // function to pretty print ast
-        function formatTree(input, indentLevel = 0) {
-            const indent = "<span style='min-width:20px;display:inline-block;'></span>".repeat(indentLevel);
-            let result = '';
-            let currentIndex = 0;
-            while (currentIndex < input.length) {
-                const char = input[currentIndex];
-                if (char === '[') {
-                    result += `${indent}${char}<br>`;
-                    indentLevel++;
-                    result += "<span style='min-width:20px;display:inline-block;'></span>".repeat(indentLevel);
-                } else if (char === ']') {
-                    indentLevel--;
-                    result += `<br>${"<span style='min-width:20px;display:inline-block;'></span>".repeat(indentLevel)}${char}`;
-                } else if (char === ',') {
-                    result += ',<br>';
-                    result += "<span style='min-width:20px;display:inline-block;'></span>".repeat(indentLevel);
-                } else if (char === ' ' || char === '\n' || char === '\t') {
-                    // pass
-                } else {
-                    result += char;
-                }
-                currentIndex++;
-            }
-            return result;
-        }
+        // function formatTree(input, indentLevel = 0) {
+        //     const indent = "<span style='min-width:20px;display:inline-block;'></span>".repeat(indentLevel);
+        //     let result = '';
+        //     let currentIndex = 0;
+        //     while (currentIndex < input.length) {
+        //         const char = input[currentIndex];
+        //         if (char === '[') {
+        //             result += `${indent}${char}<br>`;
+        //             indentLevel++;
+        //             result += "<span style='min-width:20px;display:inline-block;'></span>".repeat(indentLevel);
+        //         } else if (char === ']') {
+        //             indentLevel--;
+        //             result += `<br>${"<span style='min-width:20px;display:inline-block;'></span>".repeat(indentLevel)}${char}`;
+        //         } else if (char === ',') {
+        //             result += ',<br>';
+        //             result += "<span style='min-width:20px;display:inline-block;'></span>".repeat(indentLevel);
+        //         } else if (char === ' ' || char === '\n' || char === '\t') {
+        //             // pass
+        //         } else {
+        //             result += char;
+        //         }
+        //         currentIndex++;
+        //     }
+        //     return result;
+        // }
     </script>
 </body>
 </html>
