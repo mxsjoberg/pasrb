@@ -6,9 +6,9 @@ require "sinatra/reloader"
 require_relative "parser"
 require_relative "interpreter"
 
-set :views, File.join(settings.root, "views")
-
 # run: ruby app.rb
+
+set :views, File.join(settings.root, "views")
 
 get "/" do
     $input = Hash.new
