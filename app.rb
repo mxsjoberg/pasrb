@@ -8,10 +8,11 @@ require_relative "interpreter"
 
 # run: ruby app.rb
 
+set :public_folder, "public"
 set :views, File.join(settings.root, "views")
 
 get "/" do
-    $input = Hash.new
+    $input = Hash.new # keep this here to avoid clearing input on update
     @title = "Pascal in Ruby"
     erb :index
 end
@@ -42,7 +43,7 @@ post "/update" do
     $issues = Array.new
     $output = Array.new
     # input
-    # $inputs = Array.new
+    # $temp_inputs = Array.new
     # parse
     $ast = nil
     characters, tokens, $ast = parse(request_body["text"])
