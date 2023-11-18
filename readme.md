@@ -1,5 +1,7 @@
 ![pascal-in-ruby.png](pascal-in-ruby.png)
 
+An interactive interpreter and browser-based runtime for PL/0 written in Ruby.
+
 **[TRY IT LIVE HERE](https://pascal-in-ruby-d6aa6f469cce.herokuapp.com/)**
 
 ## Grammar (PL/0)
