@@ -1,6 +1,6 @@
 # interpreter.rb
 
-LOOP_MAX = 1000
+LOOP_MAX = 100000
 
 def interpret(ast)
     node = ast
@@ -58,6 +58,10 @@ def interpret(ast)
         while interpret(right[0]) && loop_count < LOOP_MAX
             interpret(right[1])
             loop_count += 1
+        end
+        # inf loop
+        if loop_count == LOOP_MAX
+            $issues << { pos: nil, issue: "while loop reached LOOP_MAX" }
         end
         return
     when /[a-zA-Z]/
