@@ -7,114 +7,198 @@
     <title><%= @title %></title>
     <!-- style -->
     <link rel='stylesheet' href='//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack-subset.css'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        ::selection {
-            background: #B12B2B;
-        }
         body {
-            background: lightcoral;
-            color: black;
+            background: #1A1D21;
+            color: white;
             font-family: "Hack", monospace;
-            font-size: 18px;
-            padding: 2rem;
+            font-size: 16px;
+            margin: 0;
+            padding: 0;
         }
         h1 {
+            font-size: 22px;
+            text-transform: uppercase;
+            margin: 1rem 0;
+            font-weight: bold;
             display: inline-block;
         }
-        h1,
-        p {
-            padding-left: 1rem;
-            padding-right: 1rem;
-        }
         a {
-            color: #B12B2B;
-            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        #nav {
+            position: fixed;
+            top: 0;
+            background: #1A1D21;
+            display: table;
+            width: 100%;
+            border-bottom: 1px solid #2C2F34;
+        }
+        .nav-item {
+            display: table-cell;
+            vertical-align: middle;
+            padding: 0 1rem;
+        }
+        .icon {
+            display: inline-block;
+            fill: coral;
+            vertical-align: middle;
+        }
+        .workspace {
+            margin-top: 57px;
+            display: table;
+            background: #1F2227;
+            width: 100%;
+            height: 100%;
+            min-height: 75vh;
+            border-bottom: 1px solid #2C2F34;
+        }
+        .workspace div {
+            display: table-cell;
+            min-height: 100%;
+            vertical-align: top;
+        }
+        .editor-wrapper {
+            width: 75%;
+            border-right: 1px solid #2C2F34;
         }
         textarea {
-            background: white;
-            color: black;
-            min-width: 100%;
-            min-height: 240px;
+            background: #1F2227;
+            color: white;
+            resize: none;
+            width:100%;
+            height:100%;
             font-family: "Hack", monospace;
             font-size: 18px;
-            border: 2px solid black;
             padding: 1rem;
             box-sizing: border-box;
-            border-radius: 1rem;
+            border: 0;
             outline: none !important;
         }
-        textarea:focus {
-            border: 2px solid #FD3E3E;
-        }
         input {
-            background: white;
-            color: black;
+            background: transparent;
+            color: white;
             font-family: "Hack", monospace;
-            font-size: 18px;
-            border: 2px solid black;
-            padding: 1rem;
-            box-sizing: border-box;
-            border-radius: 1rem;
+            font-size: 16px;
+            border: 2px solid #2C2F34;
+            padding: 0 1rem;
+            /*margin: 1rem;*/
             outline: none !important;
         }
         input:focus {
-            border: 2px solid #FD3E3E;
+            border: 2px solid coral;
         }
         select {
-            background: white;
-            color: black;
+            background: transparent;
+            color: white;
             font-family: "Hack", monospace;
-            font-size: 18px;
-            border: 2px solid black;
-            padding: 1rem;
-            box-sizing: border-box;
-            border-radius: 1rem;
+            cursor: pointer;
+            font-size: 16px;
+            border: 2px solid transparent;
+            padding: 0 1rem;
+            margin: 1rem;
             outline: none !important;
             float: right;
-            margin-block-start: 0.67em;
-            margin-block-end: 0.67em;
         }
+        select:hover,
         select:focus {
-            border: 2px solid #FD3E3E;
+            border: 2px solid coral;
         }
         span.token-wrapper {
             line-height: 1.5;
         }
         span.token-value {
+            color: coral;
             font-weight: bold;
-            border: 1px solid black;
-            padding: 1px 4px;
         }
-        p#footer {
-            padding-top: 2rem;
-            padding-bottom: 2rem;
-            text-align: center;
+        table {
+            border-spacing: 0;
+            width: 100%;
+        }
+        tr.header {
+            background: #2C2F34;
+        }
+        tr.header td {
+            padding: 0.25rem 1rem;
+        }
+        tr td {
+            font-size: 14px;
+            padding: 1rem;
+        }
+        tbody#inputs tr:first-child td {
+            padding: 0 1rem;
+            padding-top: 1rem; 
+        }
+        tbody#inputs tr:not(:first-child) td {
+            padding: 0.25rem 1rem;
         }
     </style>
 </head>
 <body>
-    <div>
-        <h1><%= @title %></h1>
-        <!-- select box with example programs -->
-        <select id="select-example">
-            <option value="0">Select example program</option>
-            <option value="1">While loop</option>
-            <option value="2">Inputs</option>
-        </select>
+    <div id="nav">
+        <span class="nav-item" style="width:200px;">
+            Pascal + <i class="fa-solid fa-gem fa-2xl" style="color:coral"></i>
+        </span>
+        <!-- github -->
+        <span class="nav-item">
+            <i class="fa-brands fa-github"></i>
+            <a href="https://github.com/mxsjoberg/pascal-in-ruby">Github</a>
+        </span>
+        <!-- examples -->
+        <span class="nav-item">
+            <select id="select-example">
+                <option value="0">Select example program</option>
+                <option value="1">While loop</option>
+                <option value="2">Inputs</option>
+            </select>
+        </span>
     </div>
-    <!-- editor -->
-    <textarea id="editor"></textarea>
+    <div class="workspace">
+        <!-- input -->
+        <div class="editor-wrapper">
+            <textarea id="editor"></textarea>
+        </div>
+        <!-- outputs -->
+        <div>
+            <table>
+                <tr class="header"><td><strong>Characters</strong></td></tr>
+                <tr><td><span id="characters">0</span></td></tr>
+
+                <tr class="header"><td><strong>Tokens</strong></td></tr>
+                <tr><td><span id="tokens">[]</span></td></tr>
+
+                <tr class="header"><td><strong>AST</strong></td></tr>
+                <tr><td><span id="ast">[]</span></td></tr>
+
+                <tr class="header"><td><strong>Symbols</strong></td></tr>
+                <tr><td><span id="symbols">[]</span></td></tr>
+
+                <tr class="header"><td><strong>Identifiers</strong></td></tr>
+                <tr><td><span id="identifiers">[]</span></td></tr>
+
+                <tr class="header"><td><strong>Issues</strong></td></tr>
+                <tr><td><span id="issues">[]</span></td></tr>
+
+                <tr class="header"><td><strong>Output</strong></td></tr>
+                <tr><td><span id="output"></span></td></tr>
+
+                <!-- inputs header -->
+                <tr class="header"><td><strong>Inputs</strong></td></tr>
+            </table>
+            <!-- inputs -->
+            <table>
+                <tbody id="inputs">
+                    <!-- one tr per input goes here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
     <div id="inputs"></div>
-    <!-- outputs -->
-    <p><strong>Characters:</strong> <span id="characters">0</span></p>
-    <p><strong>Tokens:</strong> <span id="tokens">[]</span></p>
-    <p><strong>AST:</strong> <span id="ast">[]</span></p>
-    <p><strong>Symbols:</strong> <span id="symbols">[]</span></p>
-    <p><strong>Identifiers:</strong> <span id="identifiers">[]</span></p>
-    <p><strong>Issues:</strong> <span id="issues">[]</span></p>
-    <p><strong>Output:</strong> <span id="output"></span></p>
-    <!-- footer -->
-    <p id="footer"><a href="https://github.com/mxsjoberg/pascal-in-ruby">github.com/mxsjoberg/pascal-in-ruby</a></p>
     <!-- update -->
     <script>
         // handle select
@@ -156,15 +240,19 @@ y := 0;
                 if (!response.ok) { throw new Error("something went wrong?") }
                 return response.json();
             }).then(data => {
-                // input
+                // inputs
                 document.getElementById("inputs").innerHTML = "";
                 try {
+                    console.log(Object.entries(JSON.parse(data.input)));
                     Object.entries(JSON.parse(data.input)).forEach(identifier => {
                         if (identifier[1] == null) { identifier[1] = "" }
                         // append input to inputs
-                        document.getElementById("inputs").innerHTML += `<input id="input-${identifier[0]}" placeholder='${identifier[0]}' value='${identifier[1]}'></input>`;
+                        document.getElementById("inputs").innerHTML += `<tr><td><span class='token-value'>${identifier[0]}</span></td><td><input id="input-${identifier[0]}" placeholder='' value='${identifier[1]}'></input></td></tr>`;
                     });
-                } catch { /* pass */ }
+                } catch {
+                    console.log("no inputs");
+                    document.getElementById("inputs").innerHTML = "";
+                }
                 // characters
                 document.getElementById("characters").innerHTML = data.characters;
                 // tokens
@@ -190,7 +278,7 @@ y := 0;
                 document.getElementById("issues").innerHTML = "";
                 JSON.parse(data.issues).forEach(issue => {
                     if (issue.pos == null) { issue.pos = "*" }
-                    document.getElementById("issues").innerHTML = document.getElementById("issues").innerHTML + `<br> - Token#<span class='token-wrapper'><span style='font-weight:bold;'>${issue.pos}</span> : ${issue.issue}</span>`;
+                    document.getElementById("issues").innerHTML = document.getElementById("issues").innerHTML + `line#<span class='token-wrapper'><span style='font-weight:bold;'>${issue.pos}</span> : ${issue.issue}</span><br>`;
                 });
                 // output
                 document.getElementById("output").innerHTML = data.output;
@@ -267,5 +355,6 @@ y := 0;
         //     return result;
         // }
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js" integrity="sha512-8RnEqURPUc5aqFEN04aQEiPlSAdE0jlFS/9iGgUyNtwFnSKCXhmB6ZTNl7LnDtDWKabJIASzXrzD0K+LYexU9g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </body>
 </html>
