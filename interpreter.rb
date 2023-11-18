@@ -1,5 +1,7 @@
 # interpreter.rb
 
+LOOP_MAX = 1000
+
 def interpret(ast)
     node = ast
 
@@ -52,8 +54,10 @@ def interpret(ast)
             return interpret(right[1])
         end
     when "while"
-        while interpret(right[0])
+        loop_count = 0
+        while interpret(right[0]) && loop_count < LOOP_MAX
             interpret(right[1])
+            loop_count += 1
         end
         return
     when /[a-zA-Z]/
