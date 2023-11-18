@@ -1,6 +1,6 @@
 ![pascal-in-ruby.png](pascal-in-ruby.png)
 
-[TRY HERE](https://pascal-in-ruby-d6aa6f469cce.herokuapp.com/)
+**[TRY IT LIVE HERE](https://pascal-in-ruby-d6aa6f469cce.herokuapp.com/)**
 
 ## Grammar (PL/0)
 
