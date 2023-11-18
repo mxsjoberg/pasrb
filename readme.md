@@ -1,10 +1,6 @@
-<!-- <img src="/pascal-in-ruby-image.png" width="200"> -->
-
-# Pascal in Ruby
+![pascal-in-ruby.png](pascal-in-ruby.png)
 
 [TRY HERE](https://pascal-in-ruby-d6aa6f469cce.herokuapp.com/)
-
-![pascal_in_ruby_v2.png](pascal_in_ruby_v2.png)
 
 ## Grammar (PL/0)
 
