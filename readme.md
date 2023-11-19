@@ -12,7 +12,7 @@ An interactive interpreter and browser-based runtime for PL/0 written in Ruby.
 
 ## Grammar (PL/0)
 
-[wikipedia.org/wiki/PL/0](https://en.wikipedia.org/wiki/PL/0) with some minor modifications. 
+Basically [wikipedia.org/wiki/PL/0](https://en.wikipedia.org/wiki/PL/0) with some minor modifications. 
 
 ```ebnf
 (* program *)
@@ -52,6 +52,8 @@ factor = identifier | number | '(' expr ')';
 
 ## Examples
 
+Example 1: This example simply increments and outputs `x`.
+
 ```pascal
 x := 0;
 while x<5 {
@@ -60,7 +62,7 @@ while x<5 {
 !x;
 ```
 
-This example simply increments and outputs `x`.
+Example 2: This example takes inputs from user (input boxes are automatically generated) and outputs the sum. User inputs currently persists until reloading page (so reload to remove inputs).
 
 ```pascal
 x := 0;
@@ -71,5 +73,3 @@ y := 0;
 
 !(x + y);
 ```
-
-This example takes inputs from user (input boxes are automatically generated) and outputs the sum. User inputs currently persists until reloading page.
