@@ -1,10 +1,12 @@
+# pascal-in-ruby
+
 ![Experimental](https://img.shields.io/badge/status-experimental-orange.svg)
 
-![pascal-in-ruby.png](pascal-in-ruby.png)
-
-An interactive interpreter and browser-based runtime for PL/0 written in Ruby.
+![banner.png](banner.png)
 
 **[TRY IT LIVE HERE](https://pascal-in-ruby-d6aa6f469cce.herokuapp.com/)**
+
+An interactive interpreter and browser-based runtime for PL/0 written in Ruby.
 
 ## Grammar (PL/0)
 
