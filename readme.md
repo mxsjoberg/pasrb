@@ -1,3 +1,5 @@
+![Experimental](https://img.shields.io/badge/status-experimental-orange.svg)
+
 ![pascal-in-ruby.png](pascal-in-ruby.png)
 
 An interactive interpreter and browser-based runtime for PL/0 written in Ruby.
