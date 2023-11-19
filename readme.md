@@ -2,7 +2,7 @@
 
 ![Experimental](https://img.shields.io/badge/status-experimental-orange.svg)
 
-![banner.png](banner.png)
+![github_banner.png](banner.png)
 
 **[TRY IT LIVE HERE](https://pascal-in-ruby-d6aa6f469cce.herokuapp.com/)**
 
